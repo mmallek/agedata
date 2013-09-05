@@ -1,8 +1,8 @@
 
 # exported rasters (as ascii)
-covarray = genfromtxt("agegrids/cover_0815_1142.txt", dtype = int, delimiter = ',', skip_header = 6)
-condarray = genfromtxt("agegrids/condclass_0815_1151.txt", dtype = int, delimiter = ',', skip_header = 6)
-agearray = genfromtxt("agegrids/age_0815_1153.txt", dtype = int, delimiter = ',', skip_header = 6)
+covarray = genfromtxt("agegrids/cover_0815_1142.txt", dtype = int, skip_header = 6)
+condarray = genfromtxt("agegrids/condclass_0815_1151.txt", dtype = int, skip_header = 6)
+agearray = genfromtxt("agegrids/age_0815_1153.txt", dtype = int, skip_header = 6)
 
 # lookup table from csv
 # col 1 = CoverCode, col 2 = ConditionCode, col 4 = min age, col 5 = max age
@@ -14,13 +14,14 @@ for cc in lookup:
     minage = cc["Min_Age"]
     maxage = cc["Max_Age"]
     covcond = (covercode == covarray) & (condcode == condarray)
+    print covcond.shape
     if covcond.sum() == 0:
         continue
     clipped_agearray = np.clip(agearray[covcond], minage, maxage)
     np.place(agearray, covcond, clipped_agearray)
     print cc["Cover"], cc["Condition"], "ages revised."
     figure()
-    hist(clipped_agearray.flat)
+    hist(clipped_agearray)
     title(cc["Cover"] + ', ' + cc["Condition"])
     axvline(minage, c = 'r', ls = '--')
     axvline(maxage, c = 'r', ls = '--')
